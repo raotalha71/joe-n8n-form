@@ -1,0 +1,8 @@
+# ...existing code...
+fastapi
+uvicorn
+jinja2
+python-multipart
+httpx
+gspread
+google-auth

@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    container_name: joe-form
+    restart: always
+    env_file:
+      - .env
+    environment:
+      GOOGLE_SERVICE_ACCOUNT_FILE: /app/secrets/quiet-enigma-475520-s1-98460f7b7c3a.json
+    volumes:
+      - ./secrets:/app/secrets:ro
+    ports:
+      - "8000:8000"
