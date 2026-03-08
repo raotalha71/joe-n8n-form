@@ -1,6 +1,5 @@
 import asyncio
 import os
-import uuid
 from datetime import datetime, timezone
 
 import gspread
@@ -48,7 +47,7 @@ SHEET_FIELD_ORDER = [
     "estimatedVolume",
 ]
 
-SHEET_HEADERS = ["submitted_at", "submission_id", *SHEET_FIELD_ORDER]
+SHEET_HEADERS = ["submitted_at", *SHEET_FIELD_ORDER]
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -95,7 +94,6 @@ def _build_payload(raw_data: dict) -> dict:
         "estimatedVolume": raw_data.get("estimatedVolume", ""),
     }
 
-    payload["submission_id"] = str(uuid.uuid4())
     payload["submitted_at"] = datetime.now(timezone.utc).isoformat()
     return payload
 
@@ -120,7 +118,7 @@ def _append_to_google_sheet(payload: dict) -> None:
     if not first_row:
         worksheet.append_row(SHEET_HEADERS, value_input_option="USER_ENTERED")
 
-    row = [payload.get("submitted_at", ""), payload.get("submission_id", "")]
+    row = [payload.get("submitted_at", "")]
     row.extend(_serialize_cell(payload.get(field, "")) for field in SHEET_FIELD_ORDER)
     worksheet.append_row(row, value_input_option="USER_ENTERED")
 
@@ -173,7 +171,6 @@ async def submit_form(request: Request):
         status_code=status_code,
         content={
             "ok": all_ok,
-            "submission_id": payload["submission_id"],
             "destinations": destination_status,
             "data": payload,
         },
